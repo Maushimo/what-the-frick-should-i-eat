@@ -1,0 +1,5 @@
+TODO:
+-Maybe give "Application" an "api_interface" member
+-need to display results
+-need to give option to view recipe and ingredient
+-search by ingredient
