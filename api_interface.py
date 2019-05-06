@@ -22,6 +22,8 @@ class api_interface():
             #       ...
             #       ...
             #       9
+        #memeber response object containing recipe information - to be searched for via id
+        self.recipe_response = []
 
     def get_search_results(self, search_term, diet_requirement):
         if diet_requirement == "No Dietary requirements":
@@ -31,3 +33,7 @@ class api_interface():
         search_string = "recipes/search?" + diet_string + "&number=10&query=" + search_term
 
         self.search_response = unirest.get(self.core_address + search_string, headers=self.headers)
+
+    def get_recipe_information(self, recipe_id):
+        id_string = "recipes/" + str(recipe_id) + "/information"
+        self.recipe_response = unirest.get(self.core_address + id_string, headers=self.headers)

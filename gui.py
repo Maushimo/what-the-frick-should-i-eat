@@ -28,9 +28,9 @@ class Application(tk.Frame):
         self.entry.pack(side=tk.TOP)
         #DIETARY CHOICE DROPDOWN
         diet_options = ["Please select an option", "No Dietary requirements", "Vegetarian", "Vegan", "Pescetarian", "Lacto Vegetarian", "Ovo Vegetarian"]
-        diet_var = tk.StringVar(self.master)
-        diet_var.set(diet_options[0])
-        self.diet_dropdown = tk.OptionMenu(self.master, diet_var, *diet_options, command=self.set_diet_dropdown_value)
+        self.diet_var = tk.StringVar(self.master)
+        self.diet_var.set(diet_options[0])
+        self.diet_dropdown = tk.OptionMenu(self.master, self.diet_var, *diet_options)
         self.diet_dropdown.pack(side=tk.TOP)
         #QUIT BUTTON
         self.quit_button = tk.Button(self)
@@ -43,24 +43,20 @@ class Application(tk.Frame):
         self.search_button["command"] = self.search_button_press
         self.search_button.pack(side=tk.TOP)
         #RESULTS DROPDOWN - INIT SETUP
-        result_dropdown_var = tk.StringVar(self.master)
-        result_dropdown_var.set(self.recipe_list[0])
-        self.result_dropdown = tk.OptionMenu(self.master, result_dropdown_var, *self.recipe_list, command=self.set_result_dropdown_value)
+        self.result_dropdown_var = tk.StringVar(self.master)
+        self.result_dropdown_var.set(self.recipe_list[0])
+        self.result_dropdown = tk.OptionMenu(self.master, self.result_dropdown_var, *self.recipe_list)
         self.result_dropdown.pack(side=tk.TOP)
         #BOTTOM CANVAS - RESULTS DISPLAY
-        #self.bottom_canvas = tk.Canvas(self, width=canvas_width*4, height=canvas_height*2, bg="grey")
-        #self.bottom_canvas.pack(side=tk.BOTTOM)
-
-    def set_diet_dropdown_value(self, value):
-        #set member variable for use in 'api_interface'
-        self.diet_dropdown_value = value
-
-    def set_result_dropdown_value(self, value):
-        self.selected_result = value
+        self.bottom_canvas = tk.Canvas(self, width=canvas_width*4, height=canvas_height*2, bg="grey")
+        self.bottom_canvas.pack(side=tk.BOTTOM)
+        #TMP BUTTON
+        self.show_recipe = tk.Button(self, text="Get Recipe", command=self.render_recipe_text)
+        self.show_recipe.pack(side=tk.BOTTOM)
 
     def search_button_press(self):
         #get the results and update the interfaces 'search_response' object
-        self.interface.get_search_results(self.entry.get(), self.diet_dropdown_value)
+        self.interface.get_search_results(self.entry.get(), self.diet_var.get())
 
         #clear recipe list
         self.recipe_list = ["RESULTS"]
@@ -77,4 +73,12 @@ class Application(tk.Frame):
         result_dropdown_var.set(self.recipe_list[0])
         self.result_dropdown = tk.OptionMenu(self.master, result_dropdown_var, *self.recipe_list)
         self.result_dropdown.pack(side=tk.TOP)
+
+    def render_recipe_text(self):
+        self.interface.get_recipe_information(self.interface.search_response.body['results'][self.recipe_list.index(self.result_dropdown_var.get())]['id'])
+        #clear canvas
+        self.bottom_canvas.delete("all")
+        print(self.interface.recipe_response.body)
+        recipe_text_string = "INSTRUCTIONS: \n" + self.interface.recipe_response.body['instructions']
+        self.recipe_text = self.bottom_canvas.create_text(100, 100, text=recipe_text_string)
 
