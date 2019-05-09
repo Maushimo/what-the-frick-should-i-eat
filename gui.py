@@ -1,4 +1,5 @@
 import Tkinter as tk
+import tkMessageBox
 from api_interface import api_interface
 
 class Application(tk.Frame):
@@ -55,8 +56,13 @@ class Application(tk.Frame):
         self.show_recipe.pack(side=tk.BOTTOM)
 
     def search_button_press(self):
-        #get the results and update the interfaces 'search_response' object
-        self.interface.get_search_results(self.entry.get(), self.diet_var.get())
+        #throw an error if a dietary option isn't selected
+        if self.diet_var.get() == "Please select an option":
+            tkMessageBox.showinfo("Error", "Please select a dietary option")
+            return
+        else:
+            #get the results and update the interfaces 'search_response' object
+            self.interface.get_search_results(self.entry.get(), self.diet_var.get())
 
         #clear recipe list
         self.recipe_list = ["RESULTS"]
@@ -75,6 +81,11 @@ class Application(tk.Frame):
         self.result_dropdown.pack(side=tk.TOP)
 
     def render_recipe_text(self):
+        #throw error if result isn't selected
+        if self.result_dropdown_var.get() == "RESULTS":
+            tkMessageBox.showinfo("Error", "Please select a recipe")
+            return
+
         self.interface.get_recipe_information(self.interface.search_response.body['results'][self.recipe_list.index(self.result_dropdown_var.get())]['id'])
         #clear canvas
         self.bottom_canvas.delete("all")
